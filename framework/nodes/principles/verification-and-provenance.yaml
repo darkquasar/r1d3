@@ -1,0 +1,13 @@
+id: verification-and-provenance
+node_type: principle
+name: Verification and Provenance
+version: "1.0"
+description: Capture sources and reasoning to support traceability and validation
+guidance: |
+  Document where your data came from, what assumptions you made, and how you reached conclusions.
+  Provenance enables peer review, supports quality assurance, and allows others to reproduce or
+  refute your findings. Verification ensures your insights withstand scrutiny.
+examples:
+  - "Tag all enrichment sources so analysts can assess data quality and freshness"
+  - "Document hypothesis generation logic to enable reproducibility"
+  - "Capture decision points and alternatives considered during hunt execution"

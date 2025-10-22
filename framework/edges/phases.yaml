@@ -1,0 +1,20 @@
+- from_node: research
+  to_node: discovery
+  relationship_type: precedes
+  description: >
+    The research phase precedes the discovery phase, as it involves gathering and analyzing information about potential threats, which then informs the active exploration and understanding of the organization's exposure and readiness in the discovery phase.
+- from_node: discovery
+  to_node: disruption
+  relationship_type: precedes
+  description: >
+    The discovery phase precedes the disruption phase, as it involves identifying vulnerabilities and instances of compromise that inform the strategies used to intercept and interrupt adversarial attack patterns in the disruption phase.
+- from_node: disruption
+  to_node: development
+  relationship_type: precedes
+  description: >
+    The disruption phase precedes the development phase, as it involves engaging with adversaries to create opportunities for defensive actions, which then leads to the implementation of findings and controls in the development phase.
+- from_node: development
+  to_node: research
+  relationship_type: precedes
+  description: >
+    The development phase precedes the research phase, as it involves implementing controls and maturing the defensive posture, which then informs further research into emerging threats and what are the focus areas that matter to the organization going forward.

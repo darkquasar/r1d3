@@ -1,0 +1,9 @@
+- from_node: research
+  to_node: discovery
+  relationship_type: precedes
+  description: Research phase precedes discovery
+
+- from_node: discovery
+  to_node: disruption
+  relationship_type: precedes
+  description: Discovery phase precedes disruption

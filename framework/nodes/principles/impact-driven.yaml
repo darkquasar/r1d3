@@ -1,0 +1,13 @@
+id: impact-driven
+node_type: principle
+name: Impact Driven
+version: "1.0"
+description: Prioritize outcomes that increase organizational resilience and measure impact at each stage
+guidance: |
+  Every hunt should have a measurable impact on organizational security posture. Define success
+  criteria upfront. Track whether findings lead to reduced risk, improved detection, or enhanced
+  response capabilities. Impact is the ultimate measure of hunting effectiveness.
+examples:
+  - "Hunt findings that lead to new detection rules increase long-term defensive capability"
+  - "Identifying infrastructure gaps that get remediated reduces attack surface"
+  - "Documenting TTPs that inform security roadmap improves strategic resilience"

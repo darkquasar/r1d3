@@ -1,0 +1,133 @@
+id: daikii
+node_type: mental-model
+name: DAIKI
+version: "1.1"
+visualization_type: svg
+source: "https://aimod2.com"
+summary: >
+  DAIKI is a semantic-chain model for threat hunting and data analysis that
+  structures work along Data -> Information -> Knowledge -> Insight to maximise impact.
+description: |
+  The DAIKI model (Data -> Information -> Knowledge -> Insight) is an adaptation
+  of the DIKW pyramid applied to threat hunting and security analytics. It
+  emphasises where in the semantic chain a hunt begins and how synthesis steps
+  transform low-value atomic data into high-impact operational insight.
+  DAIKI is mission-driven: outcomes farther along the chain typically deliver
+  greater organisational resilience and clearer risk reduction.
+principles:
+  - semantic-positioning
+  - synthesis-first
+  - impact-driven
+  - bounded-applicability
+  - verification-and-provenance
+stages:
+  - visualization:
+      type: svg
+      src_file: diagrams/hunt-data-semantics.svg
+  - phases:
+      - id: data
+        name: Data
+        description: "Atomic, disconnected observations (logs, hashes, alerts). Primary focus: collection and normalization."
+        dominant_question: "What?"
+        typical_outputs:
+          - raw_events
+          - normalized_records
+      - id: information
+        name: Information
+        description: "Contextualised data (enriched events, correlated artifacts). Primary focus: adding context and relationships."
+        dominant_question: "What (in context)?"
+        typical_outputs:
+          - correlated_timeline
+          - entity_profiles
+      - id: knowledge
+        name: Knowledge
+        description: "Interpreted information (hypotheses, adversary behaviours, tactics). Primary focus: explain why events occurred."
+        dominant_question: "Why?"
+        typical_outputs:
+          - hypotheses
+          - mapped_tactics_and_techniques
+      - id: insight
+        name: Insight
+        description: "Assimilated knowledge that drives decisions and new practices (mitigations, playbooks). Primary focus: how to act and change behaviour."
+        dominant_question: "How?"
+        typical_outputs:
+          - operational_playbooks
+          - impact_assessments
+          - strategic_recommendations
+transitions:
+  data_to_information: "Contextualisation: enrich and correlate events to reveal patterns and relationships."
+  information_to_knowledge: "Interpretation: form hypotheses that explain observed patterns and map to adversary behaviours."
+  knowledge_to_insight: "Assimilation: convert validated hypotheses into operational change, mitigations, and measurable impact."
+impact_model:
+  description: >
+    Impact is produced at every semantic level, but increases as outcomes progress
+    toward Insight. Starting analysis further along the chain (e.g., at Knowledge)
+    typically requires less raw processing to reach Insight and yields higher immediate impact.
+  guidance:
+    - "Drive hunts toward Insight when mission and resources allow."
+    - "Quantify impact as change in organisational resilience or risk exposure."
+hunt_roles_and_triggers:
+  description: "Define who or what triggers hunts and how role/responsibility maps to semantic start positions."
+  examples:
+    - trigger: "SOC alert triage"
+      likely_start: "Data -> Information"
+    - trigger: "Threat intelligence feed"
+      likely_start: "Information -> Knowledge"
+    - trigger: "Strategic risk assessment"
+      likely_start: "Knowledge -> Insight"
+inputs:
+  - name: raw_data
+    type: array
+    description: "Raw telemetry, logs, alerts, and artifacts."
+  - name: enrichments
+    type: array
+    description: "Threat intel, reputation lists, config/context data."
+  - name: mission_context
+    type: object
+    description: "Organisational priorities, assets, and risk appetite to guide bounded applicability."
+outputs:
+  - name: artifacts
+    type: array
+    description: "Normalized events, correlated timelines, entity profiles, hypotheses, playbooks."
+  - name: impact_assessment
+    type: object
+    description: "Measured change in risk/resilience attributable to hunt outcomes."
+workflow_patterns:
+  - name: semantic-progression
+    steps:
+      - "Collect and normalise Data."
+      - "Contextualise into Information (enrichment & correlation)."
+      - "Interpret into Knowledge (hypothesis generation & mapping to adversary behaviour)."
+      - "Validate and assimilate into Insight (playbooks, mitigations, measurable impact)."
+  - name: start-position-aware
+    description: "Select tooling and effort proportional to the semantic start position to optimise time-to-insight."
+evaluation_metrics:
+  - name: time_to_insight
+    description: "Elapsed time from hunt trigger to actionable insight."
+  - name: impact_delta
+    description: "Quantitative reduction in organisational risk or vulnerability attributable to the hunt."
+  - name: hypothesis_validation_rate
+    description: "Fraction of hypotheses that are confirmed, refuted, or require iteration."
+  - name: coverage_of_relevant_entities
+    description: "Proportion of critical assets and entities covered by the analysis."
+limitations:
+  - "Starting at raw Data can be resource-intensive and may yield low immediate impact without effective synthesis."
+  - "Bias in enrichment sources or bounding choices can lead to missed scenarios."
+  - "Errors in interpretation propagate; iterative validation is required."
+safety_guidelines:
+  - "Preserve privacy and minimise exposure of sensitive telemetry when sharing artifacts."
+  - "Record provenance for all enrichment and interpretation steps."
+  - "Validate operational mitigations in controlled environments before large-scale deployment."
+recommended_use_cases:
+  - "Threat hunting workflows that prioritise mission impact"
+  - "Mapping detections to adversary behaviours and mitigation playbooks"
+  - "Designing measurement frameworks for hunt effectiveness and organisational resilience"
+anti_use_cases:
+  - "Treating DAIKI as a prescriptive checklist for unrelated domains without adapting bounded applicability"
+  - "Using raw atomic checks (e.g., only hash sweeps) as the sole hunting strategy when impact is the goal"
+references:
+  - "https://aimod2.com - The Semantic Chain: DAIKI"
+  - "Cynefin framework - bounded applicability concept"
+maintainers:
+  - name: "Diego Perez"
+last_updated: 2025-10-18

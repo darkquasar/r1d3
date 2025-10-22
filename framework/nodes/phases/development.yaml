@@ -1,0 +1,8 @@
+id: development
+node_type: phase
+name: Development
+version: "1.0"
+description: >
+  The process by which you ensure findings are communicated, artefacts are developed and deployed, controls implemented (and yes, a detector artifact is just another security control, the same as a decoy or lure is) and your attack surface is ultimately transformed. Transformation here means your ability to integrate learnings into wider structures and processes informing policies and procedures. Development is about maturing your defensive posture over time by closing gaps, buying down risk, enhancing controls and improving your overall security architecture.
+linked_mental_models:
+  - daikii

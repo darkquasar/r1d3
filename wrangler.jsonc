@@ -1,6 +1,15 @@
 /**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
+ * Wrangler Configuration for R1D3 Framework Graph Visualizer
+ *
+ * This configuration supports two environments:
+ * - dev: Development environment (deployed as r1d3-dev)
+ * - production: Production environment (deployed as r1d3)
+ *
+ * Deploy commands:
+ * - Development: npx wrangler deploy --env dev
+ * - Production: npx wrangler deploy --env production (or just: npx wrangler deploy)
+ *
+ * For more details: https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
@@ -17,35 +26,62 @@
 	},
 	"observability": {
 		"enabled": true
+	},
+	/**
+	 * Environment Variables (top-level/production)
+	 * These are inherited by all environments unless overridden
+	 */
+	"vars": {
+		"ENVIRONMENT": "production",
+		"LOG_LEVEL": "info"
+	},
+	/**
+	 * Environments Configuration
+	 * Each environment creates a separate Worker deployment
+	 */
+	"env": {
+		/**
+		 * Development Environment
+		 * Deployed as: r1d3-dev
+		 * Used for: Testing, preview, staging
+		 */
+		"dev": {
+			"vars": {
+				"ENVIRONMENT": "development",
+				"LOG_LEVEL": "debug"
+			},
+			"observability": {
+				"enabled": true
+			}
+		},
+		/**
+		 * Production Environment
+		 * Deployed as: r1d3 (uses top-level name)
+		 * Used for: Live production traffic
+		 */
+		"production": {
+			"vars": {
+				"ENVIRONMENT": "production",
+				"LOG_LEVEL": "warn"
+			},
+			"observability": {
+				"enabled": true
+			}
+		}
 	}
 	/**
-	 * Smart Placement
-	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
+	 * Smart Placement (Optional)
+	 * Automatically routes requests to optimal data center
+	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/
 	 */
 	// "placement": { "mode": "smart" }
+
 	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
+	 * Future Bindings (when needed)
+	 * - KV for caching: "kv_namespaces": [{ "binding": "CACHE", "id": "..." }]
+	 * - R2 for assets: "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "..." }]
+	 * - D1 for data: "d1_databases": [{ "binding": "DB", "database_id": "..." }]
+	 *
+	 * Docs: https://developers.cloudflare.com/workers/runtime-apis/bindings/
 	 */
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 */
-	// "vars": { "MY_VARIABLE": "production_value" }
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" }
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
 }

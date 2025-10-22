@@ -1,0 +1,16 @@
+id: defense-in-depth
+node_type: principle
+name: Defense in Depth
+version: "1.0"
+description: Layer multiple security controls so that if one fails, others continue to provide protection
+guidance: |
+  Apply multiple independent layers of security controls throughout your architecture.
+  No single point of failure should compromise the entire system. Each layer should
+  use different defensive techniques to maximize coverage against various attack vectors.
+examples:
+  - "Network segmentation + Host-based firewalls + Application-level authentication"
+  - "Encryption at rest + Encryption in transit + Key rotation + Access controls"
+  - "Web Application Firewall + Input validation + Parameterized queries + Principle of least privilege"
+related_principles:
+  - least-privilege
+  - fail-secure

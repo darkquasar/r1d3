@@ -1,0 +1,10 @@
+id: discovery
+node_type: phase
+name: Discovery
+version: "1.0"
+description: >
+  The process by which you go beyond the analysis and start actively exploring your internal infrastructure and external perimeter to understand your exposure, readiness, control gaps and any instances of compromise. This is the phase where you project your initial research onto your real operational environment. This means your original data points will be transformed because your operational environment has its own texture and nuances that abstract research doesn't expose. Original data points will go through a process of implicit or explicit feature selection and dimensionality reduction.
+
+  Discovery involves finding something new, illuminating connections, and forming novel understandings that truly bring your research to the concrete and practical terrain that is your organization.downstream.
+linked_mental_models:
+  - daikii

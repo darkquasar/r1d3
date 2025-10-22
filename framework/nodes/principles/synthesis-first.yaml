@@ -1,0 +1,13 @@
+id: synthesis-first
+node_type: principle
+name: Synthesis First
+version: "1.0"
+description: Progress through explicit synthesis steps that convert data into information, information into knowledge, and knowledge into insight
+guidance: |
+  Each transition in the semantic chain requires deliberate synthesis activities. Raw data
+  becomes information through contextualization. Information becomes knowledge through interpretation.
+  Knowledge becomes insight through assimilation and action planning. Skip these steps at your peril.
+examples:
+  - "Enriching logs with threat intelligence transforms data into contextual information"
+  - "Mapping correlated events to MITRE ATT&CK transforms information into actionable knowledge"
+  - "Converting validated hypotheses into detection rules transforms knowledge into operational insight"
