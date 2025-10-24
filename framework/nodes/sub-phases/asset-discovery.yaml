@@ -1,0 +1,15 @@
+id: asset-discovery
+node_type: sub-phase
+parent_phase: discovery
+name: Asset Discovery
+version: "1.0"
+description: >
+  Comprehensive identification and cataloging of all assets within your organization's infrastructure,
+  including servers, workstations, network devices, cloud resources, and shadow IT. This process creates
+  an accurate inventory that serves as the foundation for security assessments, vulnerability management,
+  and incident response. Asset discovery must be continuous to account for dynamic environments.
+contains_components:
+  - network-mapping
+  - service-enumeration
+linked_mental_models:
+  - daikii

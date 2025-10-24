@@ -1,0 +1,12 @@
+id: service-enumeration
+node_type: sub-phase-component
+parent_sub_phase: asset-discovery
+name: Service Enumeration
+version: "1.0"
+description: >
+  Detailed identification and cataloging of all services running across your infrastructure, including
+  network protocols, application services, APIs, and exposed endpoints. Service enumeration helps
+  understand what functionality is available on each asset, which informs both security hardening
+  and attack surface reduction efforts.
+linked_mental_models:
+  - daikii

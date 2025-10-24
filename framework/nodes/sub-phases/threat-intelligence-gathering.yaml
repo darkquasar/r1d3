@@ -1,0 +1,16 @@
+id: threat-intelligence-gathering
+node_type: sub-phase
+parent_phase: research
+name: Threat Intelligence Gathering
+version: "1.0"
+description: >
+  Systematic collection and analysis of threat intelligence from multiple sources to understand
+  the current threat landscape. This includes monitoring threat actor activities, tracking emerging
+  vulnerabilities, and identifying relevant tactics, techniques, and procedures (TTPs) that may
+  impact your organization.
+contains_components:
+  - osint-collection
+  - threat-actor-profiling
+linked_mental_models:
+  - intelligence-cycle
+  - data-collection

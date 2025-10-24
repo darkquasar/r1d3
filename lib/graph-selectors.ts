@@ -12,6 +12,8 @@ import type { Node, Edge } from 'reactflow';
 import type { ReactFlowFrameworkNode } from '@/types/graph';
 import type { FrameworkNode } from '@/types/framework';
 import { calculateVisualizationPosition } from './layout-algorithms';
+import { createMentalModelEdge, createVisualizationEdge } from './edge-factory';
+import type { NodeType } from './topology-config';
 
 /**
  * Selects mental model IDs that should be visible
@@ -132,6 +134,27 @@ export function selectNodesToRender(
 }
 
 /**
+ * Helper: Get node type from node ID
+ * Determines the topology node type based on ID pattern or lookup
+ */
+function getNodeType(nodeId: string, allNodes: FrameworkNode[]): NodeType {
+  // Visualization nodes have viz- prefix
+  if (nodeId.startsWith('viz-')) {
+    return 'visualization';
+  }
+
+  // Look up in allNodes array
+  const node = allNodes.find(n => n.id === nodeId);
+  if (node) {
+    return node.node_type as NodeType;
+  }
+
+  // Default fallback (shouldn't happen)
+  console.warn(`[Graph Selectors] Unknown node type for ${nodeId}`);
+  return 'phase'; // Safe fallback
+}
+
+/**
  * Selects all edges that should be rendered
  * Creates edges based on current toggle state:
  * - Mental model edges: From ALL nodes that have toggled a mental model ON
@@ -141,13 +164,17 @@ export function selectNodesToRender(
  * @param visualizationToggles - Set of mental model IDs whose visualizations are ON
  * @param visibleMentalModelIds - Mental models currently visible
  * @param visibleVisualizationIds - Visualizations currently visible
+ * @param nodePositions - Current node positions for handle selection
+ * @param allNodes - All framework nodes (for node type lookup)
  * @returns Array of ReactFlow edges to render
  */
 export function selectEdgesToRender(
   mentalModelToggles: Map<string, Set<string>>,
   visualizationToggles: Set<string>,
   visibleMentalModelIds: Set<string>,
-  visibleVisualizationIds: Set<string>
+  visibleVisualizationIds: Set<string>,
+  nodePositions: Map<string, { x: number; y: number }>,
+  allNodes: FrameworkNode[]
 ): Edge[] {
   const edgesToRender: Edge[] = [];
 
@@ -155,40 +182,38 @@ export function selectEdgesToRender(
   mentalModelToggles.forEach((toggledByNodes, modelId) => {
     if (visibleMentalModelIds.has(modelId)) {
       toggledByNodes.forEach(nodeId => {
-        edgesToRender.push({
-          id: `mental-${nodeId}-${modelId}`,
-          source: nodeId,
-          sourceHandle: 'right-source',
-          target: modelId,
-          targetHandle: 'left',
-          type: 'straight',
-          label: 'linked-to',
-          animated: false,
-          style: {
-            stroke: '#A78BFA',
-            strokeWidth: 2,
-          },
-        });
+        // Use edge factory with ontology validation
+        const sourceType = getNodeType(nodeId, allNodes);
+        const newEdge = createMentalModelEdge(
+          nodeId,
+          sourceType as 'phase' | 'sub-phase' | 'sub-phase-component',
+          modelId,
+          nodePositions
+        );
+
+        if (newEdge) {
+          edgesToRender.push(newEdge);
+        } else {
+          console.warn(
+            `[Graph Selectors] Failed to create mental model edge: ${nodeId} (${sourceType}) → ${modelId}`
+          );
+        }
       });
     }
   });
 
   // Visualization edges: ONLY for visualizations toggled ON
   visibleVisualizationIds.forEach(modelId => {
-    edgesToRender.push({
-      id: `mental-viz-${modelId}`,
-      source: modelId,
-      sourceHandle: 'right-source',
-      target: `viz-${modelId}`,
-      targetHandle: 'left',
-      type: 'default',
-      label: 'visualizes',
-      animated: false,
-      style: {
-        stroke: '#7C3AED',
-        strokeWidth: 2,
-      },
-    });
+    const vizId = `viz-${modelId}`;
+    const newEdge = createVisualizationEdge(modelId, vizId, nodePositions);
+
+    if (newEdge) {
+      edgesToRender.push(newEdge);
+    } else {
+      console.warn(
+        `[Graph Selectors] Failed to create visualization edge: ${modelId} → ${vizId}`
+      );
+    }
   });
 
   return edgesToRender;

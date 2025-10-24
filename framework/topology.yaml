@@ -1,0 +1,353 @@
+# Framework Topology Configuration
+# Defines node types, allowed relationships, dependencies, and positioning behavior
+#
+# This file is parsed at build time and enforced throughout the application.
+# Changes require a rebuild to take effect.
+
+version: "1.0"
+
+# Node type definitions
+node_types:
+  phase:
+    display_name: "Phase"
+    physics_controlled: false  # Phases are fixed in fishbone layout
+
+    # What this node type can connect to
+    allowed_targets:
+      - edge_type: contains
+        target_type: sub-phase
+      - edge_type: linked-to
+        target_type: mental-model
+      - edge_type: precedes
+        target_type: phase
+
+    # Visibility and cascade rules
+    dependencies:
+      required_parents: []  # Phases are top-level (no parents required)
+      cascade_delete: []    # Sub-phases can exist without phases
+
+    # Position recalculation rules
+    positioning:
+      recalculate_triggers:
+        - never  # Phases never move (fixed layout)
+      preserve_user_position: false
+      recalculate_on_topology_change: false
+
+  sub-phase:
+    display_name: "Sub-Phase"
+    physics_controlled: false
+
+    allowed_targets:
+      - edge_type: contains
+        target_type: sub-phase-component
+      - edge_type: linked-to
+        target_type: mental-model
+      - edge_type: precedes
+        target_type: sub-phase
+
+    dependencies:
+      required_parents: []  # Can exist without parent phase
+      cascade_delete: []    # Components can exist without sub-phases
+
+    positioning:
+      recalculate_triggers:
+        - never
+      preserve_user_position: false
+      recalculate_on_topology_change: false
+
+  sub-phase-component:
+    display_name: "Component"
+    physics_controlled: false
+
+    allowed_targets:
+      - edge_type: uses
+        target_type: mental-model
+      - edge_type: linked-to
+        target_type: mental-model
+
+    dependencies:
+      required_parents: []  # Can exist independently
+      cascade_delete: []
+
+    positioning:
+      recalculate_triggers:
+        - never
+      preserve_user_position: false
+      recalculate_on_topology_change: false
+
+  mental-model:
+    display_name: "Mental Model"
+    physics_controlled: true  # Positioned by force simulation
+
+    allowed_targets:
+      - edge_type: visualizes
+        target_type: visualization
+
+    dependencies:
+      # Mental model must be linked from at least ONE phase/sub-phase/component
+      required_parents:
+        - types:
+            - phase
+            - sub-phase
+            - sub-phase-component
+          relationships:
+            - linked-to
+            - uses
+          mode: any  # At least ONE parent required
+
+      # When mental model is removed, remove its visualizations
+      cascade_delete:
+        - type: visualization
+          relationship: visualizes
+
+    positioning:
+      # CRITICAL: Recalculate when edges change (fixes multi-phase toggle bug)
+      recalculate_triggers:
+        - on-edge-added     # New phase toggles this mental model
+        - on-edge-removed   # Phase untoggled
+      preserve_user_position: true
+      recalculate_on_topology_change: true
+
+    # Physics parameters for force simulation
+    physics:
+      charge_strength: -1800
+      collision_radius: 190
+      link_strength: 0.3
+
+  visualization:
+    display_name: "Visualization"
+    physics_controlled: true
+
+    allowed_targets: []  # Terminal node (nothing connects from visualizations)
+
+    dependencies:
+      # Visualization MUST have parent mental model
+      required_parents:
+        - types:
+            - mental-model
+          relationships:
+            - visualizes
+          mode: all  # ALL parents must be visible
+
+      cascade_delete: []  # Nothing depends on visualizations
+
+    positioning:
+      recalculate_triggers:
+        - on-parent-moved   # Follow parent mental model
+        - on-edge-added
+        - on-edge-removed
+      preserve_user_position: true
+      recalculate_on_topology_change: true
+
+    physics:
+      charge_strength: -800  # Reduced repulsion to keep visualizations closer
+      collision_radius: 170
+      link_strength: 0.9     # Stronger pull toward mental model
+
+  # Future node types (placeholders)
+  principle:
+    display_name: "Principle"
+    physics_controlled: true
+
+    allowed_targets:
+      - edge_type: linked-to
+        target_type: mental-model
+
+    dependencies:
+      required_parents: []
+      cascade_delete: []
+
+    positioning:
+      recalculate_triggers:
+        - on-edge-added
+        - on-edge-removed
+      preserve_user_position: true
+      recalculate_on_topology_change: true
+
+    physics:
+      charge_strength: -1500
+      collision_radius: 180
+      link_strength: 0.4
+
+  output:
+    display_name: "Output"
+    physics_controlled: true
+
+    allowed_targets:
+      - edge_type: linked-to
+        target_type: outcome
+
+    dependencies:
+      required_parents:
+        - types:
+            - sub-phase-component
+          relationships:
+            - linked-to
+          mode: any
+      cascade_delete: []
+
+    positioning:
+      recalculate_triggers:
+        - on-edge-added
+        - on-edge-removed
+      preserve_user_position: true
+      recalculate_on_topology_change: true
+
+    physics:
+      charge_strength: -1400
+      collision_radius: 175
+      link_strength: 0.4
+
+  outcome:
+    display_name: "Outcome"
+    physics_controlled: true
+
+    allowed_targets:
+      - edge_type: linked-to
+        target_type: impact
+
+    dependencies:
+      required_parents:
+        - types:
+            - output
+          relationships:
+            - linked-to
+          mode: any
+      cascade_delete: []
+
+    positioning:
+      recalculate_triggers:
+        - on-edge-added
+        - on-edge-removed
+      preserve_user_position: true
+      recalculate_on_topology_change: true
+
+    physics:
+      charge_strength: -1400
+      collision_radius: 175
+      link_strength: 0.4
+
+  impact:
+    display_name: "Impact"
+    physics_controlled: true
+
+    allowed_targets: []  # Terminal node
+
+    dependencies:
+      required_parents:
+        - types:
+            - outcome
+          relationships:
+            - linked-to
+          mode: any
+      cascade_delete: []
+
+    positioning:
+      recalculate_triggers:
+        - on-edge-added
+        - on-edge-removed
+      preserve_user_position: true
+      recalculate_on_topology_change: true
+
+    physics:
+      charge_strength: -1400
+      collision_radius: 175
+      link_strength: 0.4
+
+# Edge type definitions
+edge_types:
+  contains:
+    display_name: "Contains"
+    description: "Hierarchical containment relationship"
+    style:
+      stroke: "#7C3AED"
+      stroke_width: 2
+      animated: false
+
+  precedes:
+    display_name: "Precedes"
+    description: "Sequential ordering relationship"
+    style:
+      stroke: "#A78BFA"
+      stroke_width: 2
+      animated: false
+
+  linked-to:
+    display_name: "Linked To"
+    description: "Associative relationship"
+    edge_component: smoothStep  # Use smooth step path with rounded elbows
+    style:
+      stroke: "#A78BFA"
+      stroke_width: 2
+      animated: false
+      border_radius: 12  # Rounded corners on elbows
+
+  visualizes:
+    display_name: "Visualizes"
+    description: "Visualization dependency"
+    edge_component: smoothStep  # Use smooth step path with rounded elbows
+    style:
+      stroke: "#7C3AED"
+      stroke_width: 2
+      animated: false
+      border_radius: 12  # Rounded corners on elbows
+
+  uses:
+    display_name: "Uses"
+    description: "Utility relationship"
+    style:
+      stroke: "#C4B5FD"
+      stroke_width: 2
+      animated: false
+
+# Validation rules (enforced at build time)
+validation:
+  # Prevent circular dependencies
+  disallow_cycles: true
+
+  # Warn if orphaned nodes exist
+  warn_orphaned_nodes: true
+
+  # Max depth for cascade deletes (prevent infinite loops)
+  max_cascade_depth: 5
+
+# Node Grouping Configuration
+# Defines visual groups with boundaries for pathfinding
+grouping:
+  primary-phases:
+    display_name: "Framework Phases"
+    description: "Primary phases of the R1D3 framework grouped together"
+
+    # Which nodes belong to this group
+    members:
+      node_type: phase
+      filter: all  # All phase nodes
+
+    # Visual styling for the group container
+    style:
+      border_color: "#7C3AED"
+      border_width: 3
+      border_opacity: 0.3
+      background_color: "#7C3AED"
+      background_opacity: 0.05
+      border_radius: 16
+      padding: 40
+
+    # Label configuration
+    label:
+      text: "Framework Phases"
+      show: true
+      position: inside  # Inside box at top
+      padding_top: 20   # Space from top edge
+      style:
+        font_size: 14
+        font_weight: 600
+        color: "#7C3AED"
+        opacity: 0.7
+
+    # Boundary nodes for pathfinding
+    boundary:
+      enabled: true
+      strategy: perimeter  # 8 nodes: 4 corners + 4 midpoints
+      obstacle_size: 80    # Size of invisible boundary nodes
+      spacing: 0

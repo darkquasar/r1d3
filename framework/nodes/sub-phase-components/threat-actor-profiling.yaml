@@ -1,0 +1,13 @@
+id: threat-actor-profiling
+node_type: sub-phase-component
+parent_sub_phase: threat-intelligence-gathering
+name: Threat Actor Profiling
+version: "1.0"
+description: >
+  Detailed analysis and characterization of threat actors targeting your industry or organization.
+  This involves tracking adversary capabilities, motivations, TTPs, and infrastructure to build
+  comprehensive profiles that inform defensive strategies. Profiling helps prioritize threats
+  based on intent, capability, and opportunity.
+linked_mental_models:
+  - threat-modeling
+  - intelligence-cycle

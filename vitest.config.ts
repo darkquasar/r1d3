@@ -8,6 +8,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./__tests__/setup.ts'],
     globals: true,
+    // CSS processing now works with official Tailwind v4 PostCSS config
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

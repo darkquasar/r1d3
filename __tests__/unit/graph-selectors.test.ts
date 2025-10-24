@@ -10,13 +10,46 @@ import type { Node, Edge } from 'reactflow';
 import type { ReactFlowFrameworkNode } from '@/types/graph';
 import type { FrameworkNode } from '@/types/framework';
 
-// Import selectors (these don't exist yet - TDD approach)
+// Import selectors
 import {
   selectVisibleMentalModelIds,
   selectVisibleVisualizationIds,
   selectNodesToRender,
   selectEdgesToRender,
 } from '@/lib/graph-selectors';
+
+// Mock framework nodes for edge creation tests
+const mockAllNodes: FrameworkNode[] = [
+  {
+    id: 'phase-1',
+    name: 'Phase 1',
+    node_type: 'phase',
+    version: '1.0',
+    description: 'Test phase',
+  },
+  {
+    id: 'phase-2',
+    name: 'Phase 2',
+    node_type: 'phase',
+    version: '1.0',
+    description: 'Test phase',
+  },
+  {
+    id: 'model-1',
+    name: 'Model 1',
+    node_type: 'mental-model',
+    version: '1.0',
+    description: 'Test mental model',
+  },
+];
+
+// Mock node positions for edge handle selection
+const mockNodePositions = new Map([
+  ['phase-1', { x: 0, y: 0 }],
+  ['phase-2', { x: 0, y: 500 }],
+  ['model-1', { x: 500, y: 0 }],
+  ['viz-model-1', { x: 800, y: 0 }],
+]);
 
 describe('selectVisibleMentalModelIds', () => {
   it('should return empty set when no toggles exist', () => {
@@ -242,7 +275,9 @@ describe('selectEdgesToRender', () => {
       mentalModelToggles,
       visualizationToggles,
       visibleMentalModelIds,
-      visibleVisualizationIds
+      visibleVisualizationIds,
+      mockNodePositions,
+      mockAllNodes
     );
 
     expect(result).toEqual([]);
@@ -259,7 +294,9 @@ describe('selectEdgesToRender', () => {
       mentalModelToggles,
       visualizationToggles,
       visibleMentalModelIds,
-      visibleVisualizationIds
+      visibleVisualizationIds,
+      mockNodePositions,
+      mockAllNodes
     );
 
     expect(result).toHaveLength(2);
@@ -279,7 +316,9 @@ describe('selectEdgesToRender', () => {
       mentalModelToggles,
       visualizationToggles,
       visibleMentalModelIds,
-      visibleVisualizationIds
+      visibleVisualizationIds,
+      mockNodePositions,
+      mockAllNodes
     );
 
     expect(result).toHaveLength(1);
@@ -298,7 +337,9 @@ describe('selectEdgesToRender', () => {
       mentalModelToggles,
       visualizationToggles,
       visibleMentalModelIds,
-      visibleVisualizationIds
+      visibleVisualizationIds,
+      mockNodePositions,
+      mockAllNodes
     );
 
     expect(result).toHaveLength(2); // 1 mental model edge + 1 viz edge
@@ -317,7 +358,9 @@ describe('selectEdgesToRender', () => {
       mentalModelToggles,
       visualizationToggles,
       visibleMentalModelIds,
-      visibleVisualizationIds
+      visibleVisualizationIds,
+      mockNodePositions,
+      mockAllNodes
     );
 
     expect(result).toHaveLength(1); // Only mental model edge

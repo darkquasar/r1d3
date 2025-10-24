@@ -581,13 +581,13 @@ export function calculateForceDirectedLayout(
  *
  * @param mentalModelPos - Position of the mental model node
  * @param phaseGridCenter - Center point of the phase grid
- * @param distance - Distance from mental model to visualization (default: 350px)
+ * @param distance - Distance from mental model to visualization (default: 200px)
  * @returns Calculated position for the visualization node
  */
 export function calculateVisualizationPosition(
   mentalModelPos: { x: number; y: number },
   phaseGridCenter: { x: number; y: number },
-  distance: number = 350
+  distance: number = 200
 ): { x: number; y: number } {
   // Calculate displacement vector from center to mental model
   const vectorX = mentalModelPos.x - phaseGridCenter.x;

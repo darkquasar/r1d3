@@ -26,16 +26,23 @@ import 'reactflow/dist/style.css';
 import CustomNode from './CustomNode';
 import CustomEdge from './CustomEdge';
 import StraightEdge from './StraightEdge';
+import SmartStraightEdge from './SmartStraightEdge';
+import SmartBezierEdge from './SmartBezierEdge';
+import SmoothStepEdge from './SmoothStepEdge';
 import VisualizationNode from './VisualizationNode';
+import GroupContainerNode from './GroupContainerNode';
 import type { ReactFlowFrameworkNode, ReactFlowFrameworkEdge } from '@/types/graph';
 import type { FrameworkNode, Edge as FrameworkEdge } from '@/types/framework';
 import { calculateForceDirectedLayout } from '@/lib/layout-algorithms';
 import {
   selectVisibleMentalModelIds,
   selectVisibleVisualizationIds,
-  selectNodesToRender,
   selectEdgesToRender,
 } from '@/lib/graph-selectors';
+import { TopologyManager, type GraphEdge, type GraphNode } from '@/lib/topology-manager';
+import { updateNodesIncremental, updateEdgesIncremental } from '@/lib/reactflow-helpers';
+import { getGroupingConfig } from '@/lib/grouping-config';
+import { generateGroupNodes } from '@/lib/group-manager';
 
 interface GraphCanvasProps {
   initialNodes: ReactFlowFrameworkNode[];
@@ -59,11 +66,15 @@ const nodeTypes: NodeTypes = {
   'sub-phase-component': CustomNode,
   'mental-model': CustomNode,
   visualization: VisualizationNode,
+  'group-container': GroupContainerNode,  // Visual group box
+  'boundary-obstacle': () => null,          // Invisible boundary nodes
 };
 
 const edgeTypes: EdgeTypes = {
   default: CustomEdge,
-  straight: StraightEdge,
+  straight: SmartStraightEdge,  // Smart straight edge for mental model connections
+  smartBezier: SmartBezierEdge,  // Smart bezier edge for visualization connections
+  smoothStep: SmoothStepEdge,    // Smooth step edge with rounded elbows (configured in topology.yaml)
 };
 
 /**
@@ -109,7 +120,7 @@ function GraphCanvasInner({
 }: GraphCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const { fitView, setCenter } = useReactFlow();
+  const { fitView, setCenter, getNodes } = useReactFlow();
   const previousFocusNodeId = useRef<string | undefined>(undefined);
 
   // Persist mental model positions across selections
@@ -117,6 +128,9 @@ function GraphCanvasInner({
 
   // Persist visualization positions across selections
   const visualizationPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
+
+  // Track which nodes have been manually dragged by the user
+  const userDraggedNodesRef = useRef<Set<string>>(new Set());
 
   // Track edge signature for change detection (triggers re-simulation)
   const edgeSignatureRef = useRef<string>('');
@@ -129,6 +143,10 @@ function GraphCanvasInner({
   // EFFECT 1: Force Simulation (runs only when edge topology changes)
   // ============================================================================
   useEffect(() => {
+    // Use selector functions for declarative visibility
+    const visibleMentalModelIds = selectVisibleMentalModelIds(mentalModelToggles);
+    const visibleVisualizationIds = selectVisibleVisualizationIds(visualizationToggles, visibleMentalModelIds);
+
     setNodes(currentNodes => {
       // Get current primary nodes with their positions
       const currentPrimaryNodes = currentNodes.filter(n =>
@@ -141,25 +159,25 @@ function GraphCanvasInner({
         return currentNode || initNode;
       });
 
-      // Calculate which mental models are visible (have any toggles ON)
-      const visibleMentalModelIds = Array.from(mentalModelToggles.entries())
-        .filter(([_, nodes]) => nodes.size > 0)
-        .map(([modelId]) => modelId);
-
-      if (visibleMentalModelIds.length === 0) {
-        // No mental models visible
-        return primaryNodesWithPositions;
+      if (visibleMentalModelIds.size === 0) {
+        // No mental models visible - use incremental update
+        return updateNodesIncremental(
+          currentNodes,
+          visibleMentalModelIds,
+          visibleVisualizationIds,
+          mentalModelPositionsRef.current,
+          visualizationPositionsRef.current,
+          mentalModelNodes,
+          allNodes
+        );
       }
 
       // Filter mental models to show
       const modelsToShow = mentalModelNodes.filter(mm =>
-        visibleMentalModelIds.includes(mm.id)
+        visibleMentalModelIds.has(mm.id)
       );
 
       // DYNAMIC FORCE-DIRECTED LAYOUT with re-simulation on topology changes
-      const PHASE_GRID_CENTER_X = 800;
-      const PHASE_GRID_CENTER_Y = 600;
-
       // Check if edge topology has changed (triggers re-simulation)
       const currentEdgeSignature = buildEdgeSignature(mentalModelToggles, visualizationToggles);
       const shouldReSimulate = currentEdgeSignature !== edgeSignatureRef.current;
@@ -178,6 +196,11 @@ function GraphCanvasInner({
       if (shouldReSimulate) {
         // Edge topology changed - update signature and re-run force simulation
         edgeSignatureRef.current = currentEdgeSignature;
+
+        // CRITICAL FIX (T168): Clear all drag flags on topology change
+        // This resolves the Catch-22 where dragged nodes couldn't be recalculated
+        // New topology = new optimal positions, so user drags are no longer relevant
+        userDraggedNodesRef.current.clear();
         // Build graph with primary nodes + mental models + visualizations for force simulation
         const nodesForSimulation: FrameworkNode[] = [
           ...primaryNodesWithPositions.map(n => allNodes.find(node => node.id === n.id)!).filter(Boolean),
@@ -204,7 +227,7 @@ function GraphCanvasInner({
 
         // Primary node -> Mental model edges (from ALL toggled nodes, not just selected)
         mentalModelToggles.forEach((toggledByNodes, modelId) => {
-          if (visibleMentalModelIds.includes(modelId)) {
+          if (visibleMentalModelIds.has(modelId)) {
             toggledByNodes.forEach(nodeId => {
               edgesForSimulation.push({
                 id: `mental-${nodeId}-${modelId}`,
@@ -218,7 +241,7 @@ function GraphCanvasInner({
 
         // Mental model -> Visualization edges (only for toggled visualizations)
         visualizationToggles.forEach(modelId => {
-          if (visibleMentalModelIds.includes(modelId)) {
+          if (visibleMentalModelIds.has(modelId)) {
             edgesForSimulation.push({
               id: `viz-${modelId}`,
               from_node: modelId,
@@ -252,10 +275,37 @@ function GraphCanvasInner({
           }
         );
 
+        // Build graph representation for topology manager
+        const graphEdges: GraphEdge[] = [];
+        mentalModelToggles.forEach((toggledByNodes, modelId) => {
+          toggledByNodes.forEach(nodeId => {
+            graphEdges.push({ from: nodeId, to: modelId, type: 'linked-to' });
+          });
+        });
+        visualizationToggles.forEach(modelId => {
+          graphEdges.push({ from: modelId, to: `viz-${modelId}`, type: 'visualizes' });
+        });
+
+        const graphNodes: GraphNode[] = allNodes.map(n => ({ id: n.id, type: n.node_type }));
+
+        // Get nodes that need position recalculation based on topology rules
+        const nodesToRecalculate = TopologyManager.getNodesRequiringRecalculation(
+          graphEdges, // Changed edges (all edges since we re-simulated)
+          graphNodes,
+          graphEdges,
+          userDraggedNodesRef.current
+        );
+
         // Store calculated positions for mental models
+        // Only update if topology rules say we should recalculate
         modelsToShow.forEach(model => {
           const forcePos = forcePositions.get(model.id);
-          if (forcePos && !mentalModelPositionsRef.current.has(model.id)) {
+          if (forcePos && nodesToRecalculate.has(model.id)) {
+            // Topology is forcing recalculation - clear user drag flag
+            userDraggedNodesRef.current.delete(model.id);
+            mentalModelPositionsRef.current.set(model.id, forcePos);
+          } else if (forcePos && !mentalModelPositionsRef.current.has(model.id)) {
+            // First time seeing this mental model - store initial position
             mentalModelPositionsRef.current.set(model.id, forcePos);
           }
         });
@@ -264,192 +314,76 @@ function GraphCanvasInner({
         modelsWithVisualizations.forEach(model => {
           const vizId = `viz-${model.id}`;
           const forcePos = forcePositions.get(vizId);
-          if (forcePos && !visualizationPositionsRef.current.has(vizId)) {
+          if (forcePos && nodesToRecalculate.has(vizId)) {
+            // Topology is forcing recalculation - clear user drag flag
+            userDraggedNodesRef.current.delete(vizId);
+            visualizationPositionsRef.current.set(vizId, forcePos);
+          } else if (forcePos && !visualizationPositionsRef.current.has(vizId)) {
+            // First time seeing this visualization - store initial position
             visualizationPositionsRef.current.set(vizId, forcePos);
           }
         });
       }
 
-      // Apply positions to mental models
-      const positionedModels = modelsToShow.map((model) => {
-        // Check if this mental model already exists in current nodes (preserve dragged position)
-        const existingModel = currentNodes.find(n => n.id === model.id);
-
-        if (existingModel) {
-          // Mental model already exists - preserve its current position
-          mentalModelPositionsRef.current.set(model.id, existingModel.position);
-          return existingModel;
-        }
-
-        // Get stored position (either from force simulation or previous drag)
-        const position = mentalModelPositionsRef.current.get(model.id);
-
-        if (!position) {
-          // Fallback: shouldn't happen, but place near center if no position exists
-          return {
-            ...model,
-            position: {
-              x: PHASE_GRID_CENTER_X + (Math.random() - 0.5) * 400,
-              y: PHASE_GRID_CENTER_Y + (Math.random() - 0.5) * 400,
-            },
-          };
-        }
-
-        return {
-          ...model,
-          position,
-        };
-      });
-
-      // Create visualization nodes for mental models that have visualizations
-      // Position them using force-directed layout (or preserve dragged positions)
-      const visualizationNodes: Node[] = [];
-      positionedModels.forEach((model, index) => {
-        const mentalModelData = allNodes.find(n => n.id === model.id);
-        if (mentalModelData && mentalModelData.node_type === 'mental-model') {
-          const hasVisualization =
-            (mentalModelData.visualization_type === 'heatmap' && mentalModelData.stages?.length) ||
-            (mentalModelData.visualization_type === 'funnel' && mentalModelData.stages?.length) ||
-            (mentalModelData.visualization_type === 'svg' && mentalModelData.svg_config);
-
-          if (hasVisualization) {
-            const vizId = `viz-${model.id}`;
-
-            // Check if visualization already exists in current nodes (preserve dragged position)
-            const existingViz = currentNodes.find(n => n.id === vizId);
-
-            let vizPosition: { x: number; y: number };
-
-            if (existingViz) {
-              // Preserve current position (dragged)
-              vizPosition = existingViz.position;
-              visualizationPositionsRef.current.set(vizId, vizPosition);
-            } else {
-              // Use stored position from force simulation
-              vizPosition = visualizationPositionsRef.current.get(vizId) || {
-                // Fallback: position near mental model if no force position exists
-                x: model.position.x + 300,
-                y: model.position.y - 100,
-              };
-            }
-
-            visualizationNodes.push({
-              id: vizId,
-              type: 'visualization',
-              position: vizPosition,
-              data: {
-                model: mentalModelData,
-              },
-              draggable: true,
-            });
-          }
-        }
-      });
-
-      return [...primaryNodesWithPositions, ...positionedModels, ...visualizationNodes];
-    });
-
-    // Update edges separately
-    setEdges(currentEdges => {
-      // Keep original edges (non-mental-model edges)
-      const originalEdges = currentEdges.filter(
-        e => !e.id.includes('-mental-') && !e.id.startsWith('mental-viz-')
+      // Use incremental update to preserve object references (React.memo optimization)
+      // This respects BOTH mental model visibility AND visualization toggles
+      const contentNodes = updateNodesIncremental(
+        currentNodes,
+        visibleMentalModelIds,
+        visibleVisualizationIds,
+        mentalModelPositionsRef.current,
+        visualizationPositionsRef.current,
+        mentalModelNodes,
+        allNodes
       );
 
-      // Calculate which mental models are visible (have any toggles ON)
-      const visibleMentalModelIds = Array.from(mentalModelToggles.entries())
-        .filter(([_, nodes]) => nodes.size > 0)
-        .map(([modelId]) => modelId);
+      // Generate group nodes from YAML config (visual boxes + boundary obstacles)
+      const groupingConfig = getGroupingConfig();
+      console.log('[GraphCanvas] Grouping config:', groupingConfig);
 
-      if (visibleMentalModelIds.length === 0) {
-        return originalEdges;
-      }
-
-      // Determine which mental model edges should exist
-      const desiredMentalModelEdgeIds = new Set<string>();
-      const mentalModelEdgesToCreate: Edge[] = [];
-
-      // Create edges from ALL nodes that have toggled mental models ON
-      mentalModelToggles.forEach((toggledByNodes, modelId) => {
-        if (visibleMentalModelIds.includes(modelId)) {
-          toggledByNodes.forEach(nodeId => {
-            const edgeId = `mental-${nodeId}-${modelId}`;
-            desiredMentalModelEdgeIds.add(edgeId);
-
-            // Check if this edge already exists in currentEdges
-            const existingEdge = currentEdges.find(e => e.id === edgeId);
-            if (existingEdge) {
-              // Reuse existing edge object to prevent ghosting
-              mentalModelEdgesToCreate.push(existingEdge);
-            } else {
-              // Create new edge only if it doesn't exist
-              mentalModelEdgesToCreate.push({
-                id: edgeId,
-                source: nodeId,
-                sourceHandle: 'right-source',
-                target: modelId,
-                targetHandle: 'left',
-                type: 'straight',
-                label: 'linked-to',
-                animated: false,
-                style: {
-                  stroke: '#A78BFA',
-                  strokeWidth: 2,
-                },
-              });
-            }
-          });
-        }
+      const groupNodes = Object.values(groupingConfig.groups).flatMap(config => {
+        // Use initialNodes (which always includes phases) so box appears on load
+        const nodes = generateGroupNodes(config, initialNodes);
+        console.log(`[GraphCanvas] Generated ${nodes.length} nodes for group ${config.id}`);
+        return nodes;
       });
 
-      // Determine which visualization edges should exist
-      const desiredVizEdgeIds = new Set<string>();
-      const visualizationEdgesToCreate: Edge[] = [];
+      console.log(`[GraphCanvas] Total nodes: ${contentNodes.length} content + ${groupNodes.length} group = ${contentNodes.length + groupNodes.length}`);
 
-      // Only create visualization edges for models that have their visualization toggled ON
-      visualizationToggles.forEach(modelId => {
-        if (!visibleMentalModelIds.includes(modelId)) return;
-
-        const mentalModelData = allNodes.find(n => n.id === modelId);
-        if (!mentalModelData || mentalModelData.node_type !== 'mental-model') return;
-
-        const hasVisualization =
-          (mentalModelData.visualization_type === 'heatmap' && mentalModelData.stages?.length) ||
-          (mentalModelData.visualization_type === 'funnel' && mentalModelData.stages?.length) ||
-          (mentalModelData.visualization_type === 'svg' && mentalModelData.svg_config);
-
-        if (hasVisualization) {
-          const edgeId = `mental-viz-${modelId}`;
-          desiredVizEdgeIds.add(edgeId);
-
-          // Check if this edge already exists
-          const existingEdge = currentEdges.find(e => e.id === edgeId);
-          if (existingEdge) {
-            // Reuse existing edge object
-            visualizationEdgesToCreate.push(existingEdge);
-          } else {
-            // Create new edge
-            visualizationEdgesToCreate.push({
-              id: edgeId,
-              source: modelId,
-              sourceHandle: 'right-source',
-              target: `viz-${modelId}`,
-              targetHandle: 'left',
-              type: 'default',
-              label: 'visualizes',
-              animated: false,
-              style: {
-                stroke: '#7C3AED',
-                strokeWidth: 2,
-              },
-            });
-          }
+      // Disable dragging on phase nodes (they're fixed in the fishbone layout)
+      const finalContentNodes = contentNodes.map(node => {
+        if (node.type === 'phase') {
+          return { ...node, draggable: false };
         }
+        return node;
       });
 
-      return [...originalEdges, ...mentalModelEdgesToCreate, ...visualizationEdgesToCreate];
+      // Return groups first (zIndex: -10) so they render behind content
+      return [...groupNodes, ...finalContentNodes];
     });
-  }, [mentalModelToggles, visualizationToggles, initialNodes, mentalModelNodes, allNodes, setNodes, setEdges]);
+
+    // Update edges incrementally (ReactFlow-native pattern)
+    // Smart edge library handles routing with geometry-based handle selection
+    setEdges(currentEdges => {
+      // Build node positions map for handle selection using getNodes()
+      // This avoids adding 'nodes' to dependencies which would cause infinite loop
+      const nodePositions = new Map<string, { x: number; y: number }>();
+      getNodes().forEach(node => {
+        nodePositions.set(node.id, node.position);
+      });
+
+      return updateEdgesIncremental(
+        currentEdges,
+        initialEdges,
+        mentalModelToggles,
+        visualizationToggles,
+        visibleMentalModelIds,
+        visibleVisualizationIds,
+        nodePositions,
+        allNodes
+      );
+    });
+  }, [mentalModelToggles, visualizationToggles, initialNodes, mentalModelNodes, allNodes, setNodes, setEdges, getNodes]);
 
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
@@ -460,6 +394,25 @@ function GraphCanvasInner({
       }
     },
     [onNodeSelect, allNodes]
+  );
+
+  const handleNodeDragStop = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      // Mark this node as manually positioned by user
+      userDraggedNodesRef.current.add(node.id);
+
+      // Update position storage
+      if (node.id.startsWith('viz-')) {
+        visualizationPositionsRef.current.set(node.id, node.position);
+      } else {
+        // Check if it's a mental model (physics-controlled node)
+        const frameworkNode = allNodes.find(n => n.id === node.id);
+        if (frameworkNode?.node_type === 'mental-model') {
+          mentalModelPositionsRef.current.set(node.id, node.position);
+        }
+      }
+    },
+    [allNodes]
   );
 
   const handleEdgeClick = useCallback(
@@ -506,6 +459,7 @@ function GraphCanvasInner({
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
+        onNodeDragStop={handleNodeDragStop}
         onEdgeClick={handleEdgeClick}
         onPaneClick={onPaneClick}
         nodeTypes={memoizedNodeTypes}

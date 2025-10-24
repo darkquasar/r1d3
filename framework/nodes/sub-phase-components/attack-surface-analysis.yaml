@@ -1,0 +1,12 @@
+id: attack-surface-analysis
+node_type: sub-phase-component
+parent_sub_phase: exposure-assessment
+name: Attack Surface Analysis
+version: "1.0"
+description: >
+  Comprehensive evaluation of all potential entry points that adversaries could use to compromise
+  your organization. This includes external-facing services, public cloud resources, third-party
+  integrations, and supply chain connections. Attack surface analysis quantifies risk by mapping
+  exposure to potential threats and identifying opportunities for surface reduction.
+linked_mental_models:
+  - daikii
