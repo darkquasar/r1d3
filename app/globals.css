@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+:root {
+  --radius: 0.5rem;
+  --background-primary: #000000;
+  --background-secondary: #1A1A1A;
+  --text-primary: #F5F3FF;
+  --text-secondary: #D4C5F9;
+  --purple-primary: #7C3AED;
+  --purple-hover: #6D28D9;
+  --purple-light: #A78BFA;
+
+  /* Test: New principle card colors (CSS-native v4 approach) */
+  --principle-card-bg: #8B5CF6;
+  --principle-card-border: #A78BFA;
+  --principle-card-hover-bg: #7C3AED;
+  --principle-card-hover-border: #C4B5FD;
+  --principle-card-text: #E9D5FF;
+  --principle-badge-bg: #9333EA;
+  --principle-badge-text: #FAF5FF;
+}
+
+@theme inline {
+  --color-background-primary: var(--background-primary);
+  --color-background-secondary: var(--background-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-purple-primary: var(--purple-primary);
+  --color-purple-hover: var(--purple-hover);
+  --color-purple-light: var(--purple-light);
+
+  /* Test: Principle card colors using CSS @theme (v4 native approach) */
+  --color-principle-card-bg: var(--principle-card-bg);
+  --color-principle-card-border: var(--principle-card-border);
+  --color-principle-card-hover-bg: var(--principle-card-hover-bg);
+  --color-principle-card-hover-border: var(--principle-card-hover-border);
+  --color-principle-card-text: var(--principle-card-text);
+  --color-principle-badge-bg: var(--principle-badge-bg);
+  --color-principle-badge-text: var(--principle-badge-text);
+}
+
+body {
+  background: var(--background-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--purple-primary);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-hover);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--purple-primary) var(--background-secondary);
+}
+
+/* Focus indicators for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--purple-light);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ReactFlow custom styles */
+.react-flow {
+  background: var(--background-primary);
+}
+
+.react-flow__attribution {
+  display: none;
+}

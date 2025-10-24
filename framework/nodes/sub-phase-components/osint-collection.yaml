@@ -1,0 +1,12 @@
+id: osint-collection
+node_type: sub-phase-component
+parent_sub_phase: threat-intelligence-gathering
+name: OSINT Collection
+version: "1.0"
+description: >
+  Open-source intelligence (OSINT) collection involves gathering publicly available information
+  from social media, forums, paste sites, code repositories, and other online sources to identify
+  potential threats, data leaks, and security risks relevant to your organization. This includes
+  monitoring for credential leaks, infrastructure exposure, and threat actor discussions.
+linked_mental_models:
+  - data-collection

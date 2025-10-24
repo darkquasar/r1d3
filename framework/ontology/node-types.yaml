@@ -1,0 +1,211 @@
+# R1D3 Framework Ontology
+# Defines all node types in the framework with their meanings and usage
+
+version: "1.0"
+last_updated: 2025-10-20
+
+# Node type definitions
+node_types:
+  - id: phase
+    name: Phase
+    icon: Circle
+    color: "#7C3AED"
+    category: primary
+    description: |
+      A top-level phase represents a major stage in the R1D3 framework. Phases organize
+      the high-level flow of work and provide the primary structure for the framework.
+    purpose: |
+      Phases break down the overall framework into logical temporal or functional segments.
+      They represent the "what" at the highest level of abstraction.
+    usage_guidance: |
+      - Use phases to represent major stages of work (e.g., Research, Discovery, Development)
+      - Phases should contain sub-phases that break down the work in detail
+      - Typically 3-6 phases in a complete framework
+    examples:
+      - Research Phase - Gathering intelligence and context
+      - Discovery Phase - Identifying threats and vulnerabilities
+      - Disruption Phase - Active adversary engagement
+      - Development Phase - Building capabilities and defenses
+    visibility: Always visible in canvas
+
+  - id: sub-phase
+    name: Sub-Phase
+    icon: Square
+    color: "#3B82F6"
+    category: primary
+    description: |
+      A sub-phase is a subdivision of a phase that provides more granular organization
+      of activities and components within that phase.
+    purpose: |
+      Sub-phases break down the work of a parent phase into logical groupings that can
+      be understood and executed independently while contributing to the phase goal.
+    usage_guidance: |
+      - Each sub-phase must belong to a parent phase
+      - Sub-phases should represent distinct clusters of activities
+      - Use sub-phases to organize components thematically or sequentially
+    examples:
+      - Threat Intelligence Collection (within Research Phase)
+      - Attack Surface Mapping (within Discovery Phase)
+      - Vulnerability Assessment (within Discovery Phase)
+    visibility: Always visible in canvas
+
+  - id: sub-phase-component
+    name: Component
+    icon: Hexagon
+    color: "#10B981"
+    category: primary
+    description: |
+      A component is a specific activity, task, or deliverable within a sub-phase.
+      Components represent the most granular level of the framework hierarchy.
+    purpose: |
+      Components define the actual work to be performed. They are concrete, actionable
+      elements that teams can execute and measure.
+    usage_guidance: |
+      - Each component must belong to a parent sub-phase
+      - Components should be specific and actionable
+      - Define clear inputs, outputs, and success criteria for each component
+    examples:
+      - OSINT Reconnaissance (within Threat Intelligence Collection)
+      - Network Port Scanning (within Attack Surface Mapping)
+      - CVE Database Analysis (within Vulnerability Assessment)
+    visibility: Always visible in canvas
+
+  - id: mental-model
+    name: Mental Model
+    icon: Diamond
+    color: "#14B8A6"
+    category: conceptual
+    description: |
+      A mental model is a conceptual framework or visualization pattern that helps
+      understand, reason about, or communicate complex concepts within the R1D3 framework.
+    purpose: |
+      Mental models provide cognitive scaffolding for practitioners. They offer patterns,
+      heuristics, and visual representations that make abstract concepts concrete.
+    usage_guidance: |
+      - Link mental models to phases or components where they apply
+      - Include visualizations (heatmaps, funnels, SVGs) when helpful
+      - Document the source and principles underlying each model
+      - Use mental models to bridge theory and practice
+    examples:
+      - DAIKI (Data-Information-Knowledge-Insight semantic chain)
+      - Kill Chain (adversary lifecycle model)
+      - Diamond Model (intrusion analysis framework)
+    visibility: Shown dynamically when referenced nodes are selected
+
+  - id: principle
+    name: Principle
+    icon: Star
+    color: "#EAB308"
+    category: conceptual
+    description: |
+      A principle is a guiding heuristic or rule of thumb that informs decision-making
+      and reasoning throughout the framework. Principles are abstract guidelines, not
+      concrete procedures.
+    purpose: |
+      Principles provide philosophical and practical guidance for how to approach work.
+      They help practitioners make context-appropriate decisions when procedures don't
+      cover every scenario.
+    usage_guidance: |
+      - Principles should be broadly applicable across multiple contexts
+      - Link principles to mental models, phases, or components they guide
+      - Provide concrete examples of how principles apply in practice
+      - Principles inform "how to think" rather than "what to do"
+    examples:
+      - Semantic Positioning - Understanding where analysis begins in the semantic chain
+      - Synthesis-First - Prioritizing integration over collection
+      - Bounded Applicability - Adapting methods to data characteristics
+      - Defense in Depth - Layered security controls
+    visibility: Only visible in detail panels when referenced
+
+  - id: output
+    name: Output
+    icon: FolderOpen
+    color: "#F97316"
+    category: deliverable
+    description: |
+      An output is a bounded unit of work that results from framework activities.
+      Outputs can be findings (analytical results) or artefacts (tools, documents, configs).
+    purpose: |
+      Outputs represent tangible work products. They are the concrete results that emerge
+      from executing components and phases. Outputs bridge activities and outcomes.
+    usage_guidance: |
+      - Specify whether output is a "finding" or "artefact"
+      - Link outputs to the components that produce them
+      - Define what outcomes the output enables or contributes to
+      - Provide templates or schemas where appropriate
+    examples:
+      - Threat Assessment Report (finding)
+      - Vulnerability Scan Results (finding)
+      - Detection Rule Library (artefact)
+      - Incident Response Playbook (artefact)
+    visibility: Only visible in detail panels when referenced
+
+  - id: outcome
+    name: Outcome
+    icon: Target
+    color: "#EF4444"
+    category: deliverable
+    description: |
+      An outcome is a desired change in the state of the operational system. Outcomes
+      represent measurable improvements or capabilities that result from outputs.
+    purpose: |
+      Outcomes translate work products (outputs) into operational value. They define
+      success criteria and provide leading indicators of strategic goal achievement.
+    usage_guidance: |
+      - Define clear measurement criteria for each outcome
+      - Link outcomes to the outputs that produce them
+      - Specify what impacts the outcome contributes toward
+      - Include timeframes for outcome realization where relevant
+    examples:
+      - Reduced Attack Surface (measured by exposed services count)
+      - Improved Threat Visibility (measured by detection coverage)
+      - Faster Incident Response (measured by MTTR)
+    visibility: Only visible in detail panels when referenced
+
+  - id: impact
+    name: Impact
+    icon: Trophy
+    color: "#F59E0B"
+    category: strategic
+    description: |
+      An impact represents a strategic goal with lagging indicators that measure
+      organizational resilience and capability at the highest level.
+    purpose: |
+      Impacts define the ultimate "why" of the framework. They represent business outcomes
+      and strategic objectives that the entire framework exists to achieve.
+    usage_guidance: |
+      - Define lagging indicators that prove impact has occurred
+      - Link impacts to the outcomes that drive them
+      - Specify measurement periods appropriate to the strategic timeframe
+      - Impacts should align with organizational mission and values
+    examples:
+      - Zero Breach Operations (measured by breach count, MTTD, MTTR)
+      - Regulatory Compliance (measured by audit results, violation count)
+      - Business Continuity (measured by uptime, recovery time)
+    visibility: Only visible in detail panels when referenced
+
+# Category definitions
+categories:
+  - id: primary
+    name: Primary Framework Nodes
+    description: |
+      Core structural elements that define the framework's organization and flow of work.
+      Always visible in the canvas.
+
+  - id: conceptual
+    name: Conceptual Frameworks
+    description: |
+      Abstract models and principles that guide understanding and decision-making.
+      Visible in detail panels or when explicitly linked.
+
+  - id: deliverable
+    name: Deliverables & Outcomes
+    description: |
+      Concrete work products and measurable results that demonstrate framework execution.
+      Visible in detail panels when referenced.
+
+  - id: strategic
+    name: Strategic Goals
+    description: |
+      High-level business objectives and lagging indicators of organizational success.
+      Visible in detail panels when referenced.

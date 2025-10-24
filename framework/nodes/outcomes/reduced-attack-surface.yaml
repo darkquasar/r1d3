@@ -1,0 +1,19 @@
+id: reduced-attack-surface
+node_type: outcome
+name: Reduced Attack Surface
+version: "1.0"
+description: |
+  The attack surface represents all possible entry points an adversary could exploit.
+  This outcome focuses on systematically reducing exposure by eliminating unnecessary
+  services, closing vulnerabilities, and implementing defense-in-depth controls.
+measurement_criteria:
+  - "Number of internet-facing services reduced by 40%"
+  - "Critical vulnerabilities remediated within 48 hours"
+  - "Unnecessary administrative interfaces removed or restricted"
+  - "Attack surface complexity score decreased by 30%"
+derived_from_outputs:
+  - threat-assessment-report
+  - vulnerability-scan-results
+contributes_to_impact:
+  - zero-breach-operations
+timeframe: "6 months"

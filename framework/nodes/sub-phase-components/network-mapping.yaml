@@ -1,0 +1,12 @@
+id: network-mapping
+node_type: sub-phase-component
+parent_sub_phase: asset-discovery
+name: Network Mapping
+version: "1.0"
+description: >
+  Active and passive reconnaissance of network infrastructure to create detailed topology maps.
+  This includes identifying network segments, routing configurations, trust boundaries, and network
+  devices. Network mapping provides visibility into how systems interconnect and helps identify
+  critical paths that adversaries might exploit during lateral movement.
+linked_mental_models:
+  - daikii

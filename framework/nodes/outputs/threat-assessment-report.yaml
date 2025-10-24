@@ -1,0 +1,19 @@
+id: threat-assessment-report
+node_type: output
+name: Threat Assessment Report
+version: "1.0"
+description: |
+  A structured document that identifies and analyzes potential threats to the organization,
+  including threat actor profiles, attack techniques, vulnerable assets, and recommended
+  defensive priorities.
+output_type: finding
+produced_by: research
+produces_outcome:
+  - improved-threat-visibility
+template: |
+  1. Executive Summary
+  2. Threat Actor Landscape
+  3. Attack Vector Analysis
+  4. Asset Vulnerability Assessment
+  5. Risk Prioritization Matrix
+  6. Defensive Recommendations

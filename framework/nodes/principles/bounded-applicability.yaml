@@ -1,0 +1,15 @@
+id: bounded-applicability
+node_type: principle
+name: Bounded Applicability
+version: "1.0"
+description: Adopt contextual limits and modeling choices that constrain analysis to meaningful data clusters
+guidance: |
+  Inspired by Cynefin framework, recognize that different data domains require different analytical
+  approaches. Bound your hunt scope based on data characteristics, system complexity, and available
+  context. Not all hunts suit all data types. Match your methodology to your domain.
+examples:
+  - "Structured log data suits algorithmic analysis; unstructured artifacts require manual review"
+  - "High-fidelity endpoint telemetry enables behavioral hunting; sparse network logs require indicator-based approaches"
+  - "Known-bad searches work in simple domains; pattern analysis needed in complex environments"
+related_principles:
+  - synthesis-first

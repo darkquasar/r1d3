@@ -1,0 +1,14 @@
+id: semantic-positioning
+node_type: principle
+name: Semantic Positioning
+version: "1.0"
+description: Differentiate hunt types by their position in the semantic chain where analysis starts
+guidance: |
+  Understanding where a hunt begins in the Data -> Information -> Knowledge -> Insight chain
+  helps determine the appropriate tooling, effort, and expected time-to-insight. Hunts starting
+  at higher semantic levels (Knowledge/Insight) typically require less raw processing and yield
+  higher immediate impact.
+examples:
+  - "Starting at Data level requires extensive normalization and correlation before insights emerge"
+  - "Starting at Knowledge level with threat intelligence allows rapid hypothesis testing"
+  - "Starting at Insight level with strategic assessments enables immediate tactical planning"

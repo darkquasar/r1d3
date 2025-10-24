@@ -1,0 +1,15 @@
+id: research
+node_type: phase
+name: Research
+version: "1.0"
+description: >
+  The process by which you seek to understand the threats that may impact your business. This is achieved by actively collecting, triaging and synthesizing data about your internal and external threat landscape. The research phase is also where you assess the significance of threat events to your industry vertical and, more importantly, you model these threats in terms of discrete data points called threat maps (you know many threat map models already, MITRE ATT&CK, MITRE D3FEND, MITRE ATTACK FLOW, etc.). These threat maps adopt structured formats for sharing your research downstream.
+contains_sub_phases:
+  - threat-intelligence-gathering
+  - vulnerability-research
+linked_mental_models:
+  - intelligence-cycle
+  - threat-modeling
+  - risk-management
+  - data-collection
+  - data-analysis

@@ -1,0 +1,15 @@
+id: exposure-assessment
+node_type: sub-phase
+parent_phase: discovery
+name: Exposure Assessment
+version: "1.0"
+description: >
+  Systematic evaluation of your organization's external attack surface and internal security posture.
+  This involves identifying exposed services, misconfigured systems, and potential entry points that
+  adversaries could exploit. Exposure assessment bridges the gap between abstract threat intelligence
+  and concrete organizational risk by mapping threats to actual vulnerabilities in your environment.
+contains_components:
+  - attack-surface-analysis
+  - security-posture-evaluation
+linked_mental_models:
+  - daikii

@@ -1,0 +1,87 @@
+/**
+ * Wrangler Configuration for R1D3 Framework Graph Visualizer
+ *
+ * This configuration supports two environments:
+ * - dev: Development environment (deployed as r1d3-dev)
+ * - production: Production environment (deployed as r1d3)
+ *
+ * Deploy commands:
+ * - Development: npx wrangler deploy --env dev
+ * - Production: npx wrangler deploy --env production (or just: npx wrangler deploy)
+ *
+ * For more details: https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "r1d3",
+	"main": ".open-next/worker.js",
+	"compatibility_date": "2025-03-01",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".open-next/assets"
+	},
+	"observability": {
+		"enabled": true
+	},
+	/**
+	 * Environment Variables (top-level/production)
+	 * These are inherited by all environments unless overridden
+	 */
+	"vars": {
+		"ENVIRONMENT": "production",
+		"LOG_LEVEL": "info"
+	},
+	/**
+	 * Environments Configuration
+	 * Each environment creates a separate Worker deployment
+	 */
+	"env": {
+		/**
+		 * Development Environment
+		 * Deployed as: r1d3-dev
+		 * Used for: Testing, preview, staging
+		 */
+		"dev": {
+			"vars": {
+				"ENVIRONMENT": "development",
+				"LOG_LEVEL": "debug"
+			},
+			"observability": {
+				"enabled": true
+			}
+		},
+		/**
+		 * Production Environment
+		 * Deployed as: r1d3 (uses top-level name)
+		 * Used for: Live production traffic
+		 */
+		"production": {
+			"vars": {
+				"ENVIRONMENT": "production",
+				"LOG_LEVEL": "warn"
+			},
+			"observability": {
+				"enabled": true
+			}
+		}
+	}
+	/**
+	 * Smart Placement (Optional)
+	 * Automatically routes requests to optimal data center
+	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/
+	 */
+	// "placement": { "mode": "smart" }
+
+	/**
+	 * Future Bindings (when needed)
+	 * - KV for caching: "kv_namespaces": [{ "binding": "CACHE", "id": "..." }]
+	 * - R2 for assets: "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "..." }]
+	 * - D1 for data: "d1_databases": [{ "binding": "DB", "database_id": "..." }]
+	 *
+	 * Docs: https://developers.cloudflare.com/workers/runtime-apis/bindings/
+	 */
+}

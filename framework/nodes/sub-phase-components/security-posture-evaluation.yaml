@@ -1,0 +1,12 @@
+id: security-posture-evaluation
+node_type: sub-phase-component
+parent_sub_phase: exposure-assessment
+name: Security Posture Evaluation
+version: "1.0"
+description: >
+  Holistic assessment of your organization's security controls, configurations, and defensive
+  capabilities. This involves evaluating the effectiveness of existing security measures, identifying
+  control gaps, and measuring compliance with security frameworks and best practices. Posture evaluation
+  provides a current-state baseline that guides improvement initiatives.
+linked_mental_models:
+  - daikii

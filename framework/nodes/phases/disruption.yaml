@@ -1,0 +1,9 @@
+id: disruption
+node_type: phase
+name: Disruption
+version: "1.0"
+description: >
+  The process by which you intercept and interrupt adversarial attack patterns. Disruption is about shattering adversaries' memorized patterns, destabilising and disorienting opponents, imposing high operational costs and creating crucial windows of opportunity for you to achieve defensive mission objectives. Disruption is usually comprised of deception, detection and response, i.e. all the different ways in which you can "engage" the adversary.
+linked_mental_models:
+  - daikii
+  - adversarial_engagement_space
