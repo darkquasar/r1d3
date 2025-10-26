@@ -1,0 +1,29 @@
+- id: user-centered-design
+  type: principle
+  description: Always prioritize user needs and experience
+  properties:
+    category: "Design"
+    rationale: "Products succeed when they solve real user problems"
+  position:
+    x: 100
+    y: -200
+
+- id: progressive-enhancement
+  type: principle
+  description: Build features incrementally, delivering value early
+  properties:
+    category: "Development"
+    rationale: "Early feedback reduces risk and improves outcomes"
+  position:
+    x: 600
+    y: -200
+
+- id: test-driven-development
+  type: principle
+  description: Write tests before implementation code
+  properties:
+    category: "Quality"
+    rationale: "Tests as specifications improve design and confidence"
+  position:
+    x: 1000
+    y: -200

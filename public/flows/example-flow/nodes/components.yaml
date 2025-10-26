@@ -1,0 +1,35 @@
+- id: user-research
+  type: component
+  description: Conduct user research and interviews
+  properties:
+    responsibility: "Understand user needs and pain points"
+  position:
+    x: 0
+    y: 200
+
+- id: requirements-gathering
+  type: component
+  description: Gather and document requirements
+  properties:
+    responsibility: "Document functional and non-functional requirements"
+  position:
+    x: 200
+    y: 200
+
+- id: architecture-design
+  type: component
+  description: Design system architecture
+  properties:
+    responsibility: "Create scalable and maintainable architecture"
+  position:
+    x: 400
+    y: 200
+
+- id: ui-components
+  type: component
+  description: Build reusable UI components
+  properties:
+    responsibility: "Create component library"
+  position:
+    x: 800
+    y: 200

@@ -1,0 +1,92 @@
+nodeTypes:
+  - id: phase
+    name: Phase
+    description: Top-level organizational unit representing a major stage
+    properties:
+      - name: duration
+        type: string
+        required: false
+      - name: objectives
+        type: array
+        required: false
+    layout:
+      algorithm: hierarchical
+      parameters:
+        orientation: 0
+        nodeSeparation: 100
+        rankSeparation: 150
+
+  - id: subphase
+    name: SubPhase
+    description: Child of Phase, represents a sub-stage
+    parent: phase
+    properties:
+      - name: tasks
+        type: array
+        required: false
+    layout:
+      algorithm: hierarchical
+      parameters:
+        orientation: 0
+        nodeSeparation: 80
+        rankSeparation: 120
+
+  - id: component
+    name: Component
+    description: Child of SubPhase, represents a functional component
+    parent: subphase
+    properties:
+      - name: responsibility
+        type: string
+        required: false
+    layout:
+      algorithm: force-directed
+      parameters:
+        repulsion: 300
+        attraction: 0.05
+
+  - id: action
+    name: Action
+    description: Child of Component, represents a specific action
+    parent: component
+    properties:
+      - name: command
+        type: string
+        required: false
+    layout:
+      algorithm: force-directed
+      parameters:
+        repulsion: 200
+        attraction: 0.1
+
+  - id: principle
+    name: Principle
+    description: Guiding rule or foundational concept
+    properties:
+      - name: category
+        type: string
+        required: false
+      - name: rationale
+        type: string
+        required: false
+    layout:
+      algorithm: force-directed
+      parameters:
+        repulsion: 400
+        attraction: 0.03
+
+  - id: mental-model
+    name: Mental Model
+    description: Conceptual framework or thinking pattern
+    properties:
+      - name: domain
+        type: string
+        required: false
+      - name: application
+        type: string
+        required: false
+    layout:
+      algorithm: force-directed
+      parameters:
+        repulsion: 400
+        attraction: 0.03

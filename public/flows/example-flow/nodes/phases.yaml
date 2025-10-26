@@ -1,0 +1,38 @@
+- id: discovery-phase
+  type: phase
+  description: Initial discovery to understand problem space and user needs
+  properties:
+    duration: "2 weeks"
+    objectives:
+      - Identify stakeholders
+      - Define success criteria
+      - Understand constraints
+  position:
+    x: 0
+    y: 0
+
+- id: design-phase
+  type: phase
+  description: Design and architecture planning
+  properties:
+    duration: "3 weeks"
+    objectives:
+      - Create system architecture
+      - Define data models
+      - Plan user experience
+  position:
+    x: 400
+    y: 0
+
+- id: implementation-phase
+  type: phase
+  description: Development and implementation
+  properties:
+    duration: "6 weeks"
+    objectives:
+      - Build core features
+      - Implement tests
+      - Document code
+  position:
+    x: 800
+    y: 0

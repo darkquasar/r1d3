@@ -1,0 +1,23 @@
+- id: discovery-to-research
+  source: discovery-phase
+  target: user-research
+  type: composition
+  properties: {}
+
+- id: discovery-to-requirements
+  source: discovery-phase
+  target: requirements-gathering
+  type: composition
+  properties: {}
+
+- id: design-to-architecture
+  source: design-phase
+  target: architecture-design
+  type: composition
+  properties: {}
+
+- id: implementation-to-ui
+  source: implementation-phase
+  target: ui-components
+  type: composition
+  properties: {}

@@ -1,0 +1,46 @@
+edgeTypes:
+  - id: composition
+    name: Composition
+    description: Hierarchical parent-child relationship
+    sourceTypes:
+      - phase
+      - subphase
+      - component
+    targetTypes:
+      - subphase
+      - component
+      - action
+    visual:
+      color: "#666666"
+      style: solid
+      arrow: true
+
+  - id: links-to-principle
+    name: Links to Principle
+    description: Node references a guiding principle
+    sourceTypes:
+      - phase
+      - subphase
+      - component
+      - action
+    targetTypes:
+      - principle
+    visual:
+      color: "#3b82f6"
+      style: dashed
+      arrow: true
+
+  - id: links-to-mental-model
+    name: Links to Mental Model
+    description: Node uses a mental model
+    sourceTypes:
+      - phase
+      - subphase
+      - component
+      - action
+    targetTypes:
+      - mental-model
+    visual:
+      color: "#8b5cf6"
+      style: dotted
+      arrow: true

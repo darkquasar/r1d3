@@ -47,3 +47,6 @@ next-env.d.ts
 # specify framework
 .specify
 specs
+
+# claude tracking files (debug, summaries, transient files)
+claude_tracking

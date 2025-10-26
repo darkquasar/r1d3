@@ -1,0 +1,20 @@
+- id: research-to-ucd
+  source: user-research
+  target: user-centered-design
+  type: links-to-principle
+  properties: {}
+  label: "applies"
+
+- id: architecture-to-pe
+  source: architecture-design
+  target: progressive-enhancement
+  type: links-to-principle
+  properties: {}
+  label: "follows"
+
+- id: ui-to-tdd
+  source: ui-components
+  target: test-driven-development
+  type: links-to-principle
+  properties: {}
+  label: "uses"
